@@ -4,4 +4,4 @@
 - "app" folder stores Sparta app
 - uses Node JS v20
 
-Testing the webhook dev branch- NEW
+Testing the webhook dev branch- NEW automatic

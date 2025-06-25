@@ -14,6 +14,25 @@ pipeline {
             }
         }
 
+        stage('Merge dev into main') {
+            steps {
+                sshagent(['github-ssh-key']) {
+                    sh '''
+                        git config user.email "jenkins@yourdomain.com"
+                        git config user.name "Jenkins CI"
+
+                        git fetch origin
+                        git checkout main
+                        git pull origin main
+
+                        git merge origin/dev -m "Automated merge of dev into main via Jenkins"
+
+                        git push origin main
+                    '''
+                }
+            }
+        }
+
         stage('Build Docker image') {
             steps {
                 script {

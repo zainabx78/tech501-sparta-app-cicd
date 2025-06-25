@@ -6,9 +6,9 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout dev') {
             steps {
-                git branch: 'main',
+                git branch: 'dev',
                     url: 'git@github.com:zainabx78/tech501-sparta-app-cicd.git',
                     credentialsId: 'github-ssh-key'
             }
@@ -16,18 +16,14 @@ pipeline {
 
         stage('Merge dev into main') {
             steps {
-                sshagent(['github-ssh-key']) {
+                script {
                     sh '''
-                        git config user.email "jenkins@yourdomain.com"
-                        git config user.name "Jenkins CI"
-
-                        git fetch origin
-                        git checkout main
-                        git pull origin main
-
-                        git merge origin/dev -m "Automated merge of dev into main via Jenkins"
-
-                        git push origin main
+                    git config user.email "jenkins@example.com"
+                    git config user.name "Jenkins CI"
+                    git checkout main
+                    git pull origin main
+                    git merge dev
+                    git push origin main
                     '''
                 }
             }
@@ -37,7 +33,7 @@ pipeline {
             steps {
                 script {
                     env.IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                    dockerImage = docker.build(env.IMAGE_TAG, 'app') // build from 'app' directory
+                    dockerImage = docker.build(env.IMAGE_TAG, 'app')
                 }
             }
         }

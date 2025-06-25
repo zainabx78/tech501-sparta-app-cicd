@@ -16,7 +16,8 @@ pipeline {
 
         stage('Merge dev into main') {
             steps {
-                script {
+		sshagent(['github-ssh-key']) {
+          
                     sh '''
                     git config user.email "jenkins@example.com"
                     git config user.name "Jenkins"
@@ -25,7 +26,7 @@ pipeline {
                     git pull origin main --rebase
                     git merge dev --no-ff -m "merged dev to main with jenkins"
                     git push origin main
-                    '''
+                '''
                 }
             }
         }

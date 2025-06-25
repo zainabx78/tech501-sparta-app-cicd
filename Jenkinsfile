@@ -54,10 +54,25 @@ pipeline {
         }
 
         stage('Deploy to Minikube.') {
-            steps {
-                sh 'scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@54.217.157.100:/tmp/'
-                sh 'ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@54.217.157.100 "kubectl apply -f /tmp/sparta-app.yml"'
-            }
-        }
-    }
+ 	   steps {
+        	script {
+            		def imageTag = "sparta-app:${BUILD_NUMBER}"
+            		def dockerImage = "zainab7861/${imageTag}"
+
+	            	// Build and push the updated Docker image
+            		sh "docker build -t ${dockerImage} ."
+            		sh "docker push ${dockerImage}"
+
+            		// Copy the K8s manifest (if needed)
+            		sh "scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@54.217.157.100:/tmp/"
+
+            		// Apply the manifest and update the image via SSH on the remote EC2 machine
+            		sh """
+            		ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@54.217.157.100 << EOF
+                		kubectl apply -f /tmp/sparta-app.yml
+                		kubectl set image deployment/nodejs-deployment nodejs-container=${dockerImage} --record
+            		EOF
+            		"""
+        	}
+    	}
 }

@@ -63,7 +63,7 @@ pipeline {
                     sh """
                         ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} << EOF
                             kubectl apply -f /tmp/sparta-app.yml
-                            kubectl set image deployment/nodejs-deployment nodejs-container=${dockerImage} --record
+                            kubectl set image deployment/nodejs-deployment nodejs-app=${dockerImage} --record
                         EOF
                     """
                 }

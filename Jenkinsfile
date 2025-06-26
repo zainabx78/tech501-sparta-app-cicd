@@ -60,12 +60,13 @@ pipeline {
                     sh "scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@${TARGET_VM}:/tmp/"
 
                     // SSH into the remote server and apply the manifest & update the deployment image
-                    sh """
-                        ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} <<EOF
-                            kubectl apply -f /tmp/sparta-app.yml
-                            kubectl set image deployment/nodejs-deployment nodejs-app=${dockerImage} --record
-                            EOF
-                    """
+                sh """#!/bin/bash
+ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} <<EOF
+kubectl apply -f /tmp/sparta-app.yml
+kubectl set image deployment/nodejs-deployment nodejs-app=${dockerImage} --record
+EOF
+"""
+
                 }
             }
         }

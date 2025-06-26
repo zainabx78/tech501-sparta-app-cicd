@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'zainab7861/zainab-sparta-app'
-        TARGET_VM = '3.253.71.151'
+        TARGET_VM = '108.130.50.28'
     }
 
     stages {
@@ -60,12 +60,13 @@ pipeline {
                     sh "scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@${TARGET_VM}:/tmp/"
 
                     // SSH into the remote server and apply the manifest & update the deployment image
-                    sh """
-                        ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} << EOF
-                            kubectl apply -f /tmp/sparta-app.yml
-                            kubectl set image deployment/nodejs-deployment nodejs-container=${dockerImage} --record
-                        EOF
-                    """
+                sh """#!/bin/bash
+ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} <<EOF
+kubectl apply -f /tmp/sparta-app.yml
+kubectl set image deployment/nodejs-deployment nodejs-app=${dockerImage} --record
+EOF
+"""
+
                 }
             }
         }

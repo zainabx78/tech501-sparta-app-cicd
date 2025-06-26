@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'zainab7861/zainab-sparta-app'
-        TARGET_VM = '3.253.71.151'
+        TARGET_VM = '108.130.50.28'
     }
 
     stages {

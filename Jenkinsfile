@@ -24,6 +24,7 @@ pipeline {
                         git checkout main
                         git pull origin main --rebase
                         git merge dev --no-ff -m "merged dev to main with jenkins"
+                        git remote set-url origin git@github.com:zainabx78/tech501-sparta-app-cicd.git
                         git push origin main
                     '''
                 }

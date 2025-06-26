@@ -61,7 +61,7 @@ pipeline {
 
                     // SSH into the remote server and apply the manifest & update the deployment image
                     sh """
-                        ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} << EOF
+                        ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} <<EOF
                             kubectl apply -f /tmp/sparta-app.yml
                             kubectl set image deployment/nodejs-deployment nodejs-app=${dockerImage} --record
                     EOF

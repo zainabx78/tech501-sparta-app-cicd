@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'zainab7861/zainab-sparta-app'
+        TARGET_VM = '3.253.71.151'
     }
 
     stages {
@@ -16,21 +17,18 @@ pipeline {
 
         stage('Merge dev into main') {
             steps {
-		sshagent(['github-ssh-key']) {
-          
+                sshagent(['github-ssh-key']) {
                     sh '''
-                    git config user.email "jenkins@example.com"
-                    git config user.name "Jenkins"
-                    git checkout main
-		
-                    git pull origin main --rebase
-                    git merge dev --no-ff -m "merged dev to main with jenkins"
-                    git push origin main
-                '''
+                        git config user.email "jenkins@example.com"
+                        git config user.name "Jenkins"
+                        git checkout main
+                        git pull origin main --rebase
+                        git merge dev --no-ff -m "merged dev to main with jenkins"
+                        git push origin main
+                    '''
                 }
             }
         }
-
 
         stage('Build Docker image') {
             steps {
@@ -55,8 +53,20 @@ pipeline {
 
         stage('Deploy to Minikube.') {
             steps {
-                sh 'scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@54.217.157.100:/tmp/'
-                sh 'ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@54.217.157.100 "kubectl apply -f /tmp/sparta-app.yml"'
+                script {
+                    def dockerImage = env.IMAGE_TAG
+
+                    // Copy the K8s manifest file to the remote server
+                    sh "scp -i /var/lib/jenkins/.ssh/aws-key-zainab.pem k8s/sparta-app.yml ubuntu@${TARGET_VM}:/tmp/"
+
+                    // SSH into the remote server and apply the manifest & update the deployment image
+                    sh """
+                        ssh -i /var/lib/jenkins/.ssh/aws-key-zainab.pem ubuntu@${TARGET_VM} << EOF
+                            kubectl apply -f /tmp/sparta-app.yml
+                            kubectl set image deployment/nodejs-deployment nodejs-container=${dockerImage} --record
+                        EOF
+                    """
+                }
             }
         }
     }

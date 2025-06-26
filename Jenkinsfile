@@ -26,6 +26,10 @@ pipeline {
                         git merge dev --no-ff -m "merged dev to main with jenkins"
                         git remote set-url origin git@github.com:zainabx78/tech501-sparta-app-cicd.git
                         git push origin main
+
+                        git checkout dev
+                        git merge main --no-ff -m "synced dev with main"
+                        git push origin dev
                     '''
                 }
             }
